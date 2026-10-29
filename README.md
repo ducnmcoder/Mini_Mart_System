@@ -65,7 +65,6 @@ Các nguyên tắc chính:
 - Số liệu dashboard đọc từ các bảng nghiệp vụ tương ứng trong database.
 - Xem/sửa họ tên, thêm/sửa/xóa số điện thoại, đổi mật khẩu và lưu xuống `USER_ACCOUNT`.
 - Ghi thay đổi hồ sơ xuống `AUDIT_LOG`.
-- “Xóa tài khoản” được triển khai theo kiểu soft-delete (`status = INACTIVE`) để không làm hỏng các khóa ngoại/lịch sử giao dịch.
 - Nút đăng xuất ở cuối menu bên trái trên cả bốn dashboard.
 - Giao diện responsive cho desktop, tablet và điện thoại.
 

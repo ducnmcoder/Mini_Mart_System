@@ -9,7 +9,5 @@ public interface AccountService {
 
     AccountProfileDto updateProfile(String email, ProfileUpdateRequest request);
 
-    void deactivateAccount(String email, String password);
-
     String recordSuccessfulLoginAndGetDashboardPath(String email);
 }

@@ -22,12 +22,12 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<DashboardMetricDto> getMetrics(AppRole role, Long accountId) {
+    public List<DashboardMetricDto> getMetrics(AppRole role) {
         return switch (role) {
             case ADMIN -> adminMetrics();
             case OWNER -> ownerMetrics();
-            case SALE_STAFF -> saleMetrics(accountId);
-            case INVENTORY_STAFF -> inventoryMetrics();
+            case SALE_STAFF -> List.of();
+            case INVENTORY_STAFF -> List.of();
         };
     }
 
@@ -40,26 +40,14 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private List<DashboardMetricDto> ownerMetrics() {
+        long lowStockAlerts = statisticsRepository.countActiveLowStockAlerts();
         return List.of(
                 moneyMetric("Doanh thu", statisticsRepository.completedRevenue(), "Đơn hàng hoàn tất", "revenue"),
                 metric("Đơn hàng", statisticsRepository.countCompletedSales(), "Tổng giao dịch thành công", "receipt"),
-                metric("Cảnh báo tồn", statisticsRepository.countActiveLowStockAlerts(), "Sản phẩm cần nhập thêm", "alert")
-        );
-    }
-
-    private List<DashboardMetricDto> saleMetrics(Long accountId) {
-        return List.of(
-                metric("Đơn đã bán", statisticsRepository.countCompletedSalesByCashier(accountId), "Giao dịch của bạn", "receipt"),
-                moneyMetric("Doanh số", statisticsRepository.completedRevenueByCashier(accountId), "Tổng giá trị bán hàng", "revenue"),
-                metric("Đơn hoàn", statisticsRepository.countCompletedRefundsByStaff(accountId), "Đã xử lý hoàn tiền", "return")
-        );
-    }
-
-    private List<DashboardMetricDto> inventoryMetrics() {
-        return List.of(
+                metric("Cảnh báo tồn", lowStockAlerts, "Sản phẩm cần nhập thêm", "alert"),
                 metric("Sản phẩm", statisticsRepository.countActiveProducts(), "Đang kinh doanh", "box"),
                 metric("Tồn kho", statisticsRepository.totalQuantityOnHand(), "Tổng số lượng hiện có", "warehouse"),
-                metric("Sắp hết hàng", statisticsRepository.countActiveLowStockAlerts(), "Cảnh báo đang mở", "alert")
+                metric("Sắp hết hàng", lowStockAlerts, "Cảnh báo đang mở", "alert")
         );
     }
 

@@ -50,7 +50,7 @@ public class DashboardController {
         }
         model.addAttribute("page", pageAssembler.assemble(
                 profile,
-                dashboardService.getMetrics(profile.role(), profile.id())
+                dashboardService.getMetrics(profile.role())
         ));
         return ViewNames.DASHBOARD;
     }

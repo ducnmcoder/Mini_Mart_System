@@ -38,18 +38,6 @@ public class DashboardStatisticsRepository {
         return count("SELECT COUNT(*) FROM dbo.LOW_STOCK_ALERT WHERE status='ACTIVE'");
     }
 
-    public long countCompletedSalesByCashier(Long accountId) {
-        return count("SELECT COUNT(*) FROM dbo.SALE WHERE cashier_id=? AND status='COMPLETED'", accountId);
-    }
-
-    public BigDecimal completedRevenueByCashier(Long accountId) {
-        return money("SELECT COALESCE(SUM(grand_total),0) FROM dbo.SALE WHERE cashier_id=? AND status='COMPLETED'", accountId);
-    }
-
-    public long countCompletedRefundsByStaff(Long accountId) {
-        return count("SELECT COUNT(*) FROM dbo.REFUND WHERE processed_by=? AND status='COMPLETED'", accountId);
-    }
-
     public long countActiveProducts() {
         return count("SELECT COUNT(*) FROM dbo.PRODUCT WHERE status='ACTIVE'");
     }

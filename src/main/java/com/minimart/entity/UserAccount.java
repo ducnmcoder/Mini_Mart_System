@@ -79,11 +79,6 @@ public class UserAccount {
         markUpdated();
     }
 
-    public void deactivate() {
-        this.status = AccountStatus.INACTIVE;
-        markUpdated();
-    }
-
     public boolean isLoginAllowed() {
         return status == AccountStatus.ACTIVE && role.isActive();
     }

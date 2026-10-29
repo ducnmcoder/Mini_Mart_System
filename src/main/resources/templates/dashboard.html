@@ -83,7 +83,7 @@
                 </div>
             </section>
 
-            <section class="metric-grid" aria-label="Số liệu tổng quan">
+            <section class="metric-grid" aria-label="Số liệu tổng quan" th:if="${!#lists.isEmpty(page.metrics)}">
                 <article class="metric-card" th:each="metric : ${page.metrics}">
                     <div class="metric-card__icon" th:classappend="${'metric-card__icon--' + metric.icon}">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M6 16V9m6 7V5m6 11v-4"/></svg>
@@ -178,36 +178,11 @@
                     </div>
                 </form>
 
-                <div class="danger-zone">
-                    <div>
-                        <strong>Vô hiệu hóa tài khoản</strong>
-                        <p>Bạn sẽ bị đăng xuất và không thể đăng nhập lại cho đến khi quản trị viên kích hoạt.</p>
-                    </div>
-                    <button class="button button--danger-outline" type="button" data-dialog-open="delete-dialog">Xóa tài khoản</button>
-                </div>
-                <p class="inline-error" th:if="${deleteError}" th:text="${deleteError}"></p>
             </section>
         </div>
     </main>
 </div>
 
-<dialog class="confirm-dialog" id="delete-dialog">
-    <form th:action="@{/profile/delete}" method="post">
-        <div class="dialog-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"/></svg>
-        </div>
-        <h2>Xác nhận xóa tài khoản?</h2>
-        <p>Dữ liệu nghiệp vụ được giữ lại để bảo toàn lịch sử. Tài khoản sẽ chuyển sang trạng thái không hoạt động.</p>
-        <div class="form-field">
-            <label for="deletePassword">Nhập mật khẩu để xác nhận</label>
-            <input id="deletePassword" name="deletePassword" type="password" required autocomplete="current-password">
-        </div>
-        <div class="dialog-actions">
-            <button class="button button--ghost" type="button" data-dialog-close>Quay lại</button>
-            <button class="button button--danger" type="submit">Xác nhận xóa</button>
-        </div>
-    </form>
-</dialog>
 <div class="sidebar-backdrop" data-menu-toggle></div>
 <script th:src="@{/js/app.js}" defer></script>
 </body>

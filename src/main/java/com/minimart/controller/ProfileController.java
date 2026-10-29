@@ -7,8 +7,6 @@ import com.minimart.service.DashboardService;
 import com.minimart.ui.DashboardPageAssembler;
 import com.minimart.ui.ViewNames;
 import com.minimart.validation.ProfileValidationException;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -16,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -52,7 +49,7 @@ public class ProfileController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("page", pageAssembler.assemble(
                     currentProfile,
-                    dashboardService.getMetrics(currentProfile.role(), currentProfile.id())
+                    dashboardService.getMetrics(currentProfile.role())
             ));
             return ViewNames.DASHBOARD;
         }
@@ -61,22 +58,5 @@ public class ProfileController {
                 "successMessage", "Thông tin cá nhân đã được lưu xuống cơ sở dữ liệu."
         );
         return "redirect:" + currentProfile.role().dashboardPath() + "#profile";
-    }
-
-    @PostMapping("/profile/delete")
-    public String deleteAccount(@RequestParam(name = "deletePassword", defaultValue = "") String password,
-                                Authentication authentication,
-                                HttpServletRequest servletRequest,
-                                RedirectAttributes redirectAttributes) throws ServletException {
-        AccountProfileDto currentProfile = accountService.getProfile(authentication.getName());
-        try {
-            accountService.deactivateAccount(authentication.getName(), password);
-        } catch (ProfileValidationException exception) {
-            redirectAttributes.addFlashAttribute("deleteError", exception.getMessage());
-            return "redirect:" + currentProfile.role().dashboardPath() + "#profile";
-        }
-
-        servletRequest.logout();
-        return "redirect:/login?deleted";
     }
 }

@@ -62,22 +62,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public void deactivateAccount(String email, String password) {
-        UserAccount account = requireAccount(email);
-        if (password == null || password.isBlank()
-                || !passwordEncoder.matches(password, account.getPasswordHash())) {
-            throw new ProfileValidationException("deletePassword", "Mật khẩu xác nhận không đúng.");
-        }
-
-        Map<String, Object> oldValues = snapshot(account);
-        account.deactivate();
-        accountRepository.save(account);
-        auditService.record(account.getId(), "ACCOUNT_DEACTIVATE", "USER_ACCOUNT", account.getId().toString(),
-                oldValues, snapshot(account));
-    }
-
-    @Override
-    @Transactional
     public String recordSuccessfulLoginAndGetDashboardPath(String email) {
         UserAccount account = requireAccount(email);
         account.recordSuccessfulLogin();

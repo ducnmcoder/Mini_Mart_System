@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface DashboardService {
 
-    List<DashboardMetricDto> getMetrics(AppRole role, Long accountId);
+    List<DashboardMetricDto> getMetrics(AppRole role);
 }
