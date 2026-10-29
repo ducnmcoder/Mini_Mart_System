@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Đã có lỗi | MiniMart</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="login-page">
+<main class="login-panel" style="min-height:100vh">
+    <section class="login-card" style="text-align:center">
+        <div class="brand" style="justify-content:center;margin-bottom:36px">
+            <span class="brand__mark">M</span><span>Mini<span>Mart</span></span>
+        </div>
+        <p class="eyebrow eyebrow--green">LỖI <span th:text="${status}">500</span></p>
+        <h1>Không thể hoàn thành yêu cầu</h1>
+        <p style="color:var(--muted);line-height:1.7">Vui lòng quay lại trang trước hoặc thử đăng nhập lại.</p>
+        <a class="button button--primary" th:href="@{/dashboard}" style="margin-top:20px;text-decoration:none">Về trang tổng quan</a>
+    </section>
+</main>
+</body>
+</html>

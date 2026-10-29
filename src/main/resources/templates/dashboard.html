@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${page.dashboardTitle + ' | MiniMart'}">Dashboard | MiniMart</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="dashboard-page">
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand sidebar__brand">
+            <span class="brand__mark" aria-hidden="true">
+                <svg viewBox="0 0 36 36"><path d="M10 10h3l2.2 12h11l2.4-8H15.4M17 28a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 17 28Zm9 0a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 26 28Z"/></svg>
+            </span>
+            <span>Mini<span>Mart</span></span>
+        </div>
+
+        <div class="role-badge">
+            <span class="role-badge__dot"></span>
+            <div><small>Không gian làm việc</small><strong th:text="${page.dashboardTitle}">ADMIN DASHBOARD</strong></div>
+        </div>
+
+        <nav class="sidebar__nav" aria-label="Điều hướng chính">
+            <p class="nav-label">Danh mục</p>
+            <a class="nav-item nav-item--active" href="#overview">
+                <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z"/></svg>
+                <span>Tổng quan</span>
+            </a>
+            <a class="nav-item" href="#profile">
+                <svg viewBox="0 0 24 24"><path d="M4 20v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+                <span>Quản lý thông tin cá nhân</span>
+            </a>
+        </nav>
+
+        <div class="sidebar__account">
+            <div class="sidebar-user">
+                <span class="avatar" th:text="${#strings.substring(page.account.fullName,0,1)}">M</span>
+                <span><strong th:text="${page.account.fullName}">Người dùng</strong><small th:text="${page.roleName}">Vai trò</small></span>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="logout-button" type="submit">
+                    <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5m5 5H3m12-9h5v18h-5"/></svg>
+                    Đăng xuất
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-button" type="button" data-menu-toggle aria-label="Mở menu">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <div>
+                <p class="topbar__date" data-current-date>Thứ năm, 22 tháng 10</p>
+                <h1 th:text="${page.dashboardTitle}">ADMIN DASHBOARD</h1>
+            </div>
+            <div class="topbar__user">
+                <span><small>Xin chào,</small><strong th:text="${page.account.fullName}">Minh Admin</strong></span>
+                <span class="avatar avatar--large" th:text="${#strings.substring(page.account.fullName,0,1)}">M</span>
+            </div>
+        </header>
+
+        <div class="content-wrap">
+            <div class="toast toast--success" th:if="${successMessage}" role="status" data-auto-dismiss>
+                <svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>
+                <span th:text="${successMessage}">Đã lưu thay đổi.</span>
+            </div>
+
+            <section id="overview" class="welcome-banner">
+                <div>
+                    <span class="eyebrow eyebrow--green">TỔNG QUAN HÔM NAY</span>
+                    <h2>Chào <span th:text="${page.account.fullName}">bạn</span>, chúc bạn một ngày hiệu quả!</h2>
+                    <p>Dữ liệu bên dưới được tổng hợp trực tiếp từ hệ thống MiniMart.</p>
+                </div>
+                <div class="welcome-illustration" aria-hidden="true">
+                    <svg viewBox="0 0 160 110"><path class="blob" d="M23 82c-13-20 8-47 26-61 20-16 59-12 76 8 18 22 14 55-7 70-24 18-79 8-95-17Z"/><path class="bag" d="M57 44h48l-5 48H62zM69 47c0-22 25-22 25 0"/><path class="leaf" d="M105 34c14-17 29-6 23 10-13 2-20-1-23-10Z"/></svg>
+                </div>
+            </section>
+
+            <section class="metric-grid" aria-label="Số liệu tổng quan">
+                <article class="metric-card" th:each="metric : ${page.metrics}">
+                    <div class="metric-card__icon" th:classappend="${'metric-card__icon--' + metric.icon}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M6 16V9m6 7V5m6 11v-4"/></svg>
+                    </div>
+                    <div>
+                        <p th:text="${metric.label}">Chỉ số</p>
+                        <strong th:text="${metric.value}">0</strong>
+                        <small th:text="${metric.note}">Ghi chú</small>
+                    </div>
+                </article>
+            </section>
+
+            <section id="profile" class="profile-card">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow eyebrow--green">HỒ SƠ CỦA BẠN</span>
+                        <h2>Quản lý thông tin cá nhân</h2>
+                        <p>Thêm, chỉnh sửa hoặc xóa thông tin. Nhấn “Lưu thay đổi” để cập nhật xuống cơ sở dữ liệu.</p>
+                    </div>
+                    <span class="profile-status"><i></i> Đang hoạt động</span>
+                </div>
+
+                <form class="profile-form" th:action="@{/profile}" th:object="${profileRequest}" method="post" novalidate>
+                    <div class="profile-summary">
+                        <span class="avatar avatar--profile" th:text="${#strings.substring(page.account.fullName,0,1)}">M</span>
+                        <div>
+                            <strong th:text="${page.account.fullName}">Người dùng</strong>
+                            <span th:text="${page.account.email}">email@example.com</span>
+                            <small th:text="${page.roleName}">Vai trò</small>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="fullName">Họ và tên <em>*</em></label>
+                            <input id="fullName" type="text" th:field="*{fullName}" maxlength="120" placeholder="Nhập họ và tên">
+                            <span class="field-error" th:errors="*{fullName}"></span>
+                        </div>
+                        <div class="form-field">
+                            <label for="accountEmail">Tài khoản đăng nhập</label>
+                            <input id="accountEmail" type="email" th:value="${page.account.email}" disabled>
+                            <span class="field-hint">Email đăng nhập được quản trị viên quản lý.</span>
+                        </div>
+                        <div class="form-field">
+                            <label for="phone">Số điện thoại</label>
+                            <div class="input-with-action">
+                                <input id="phone" type="tel" th:field="*{phone}" maxlength="20" placeholder="Thêm số điện thoại">
+                                <button type="button" data-clear-input="phone" title="Xóa số điện thoại" aria-label="Xóa số điện thoại">
+                                    <svg viewBox="0 0 24 24"><path d="M4 7h16m-10 4v6m4-6v6M9 7l1-3h4l1 3m-9 0 1 14h10l1-14"/></svg>
+                                </button>
+                            </div>
+                            <span class="field-error" th:errors="*{phone}"></span>
+                        </div>
+                        <div class="form-field">
+                            <label>Vai trò</label>
+                            <input type="text" th:value="${page.roleName}" disabled>
+                        </div>
+                    </div>
+
+                    <div class="password-section">
+                        <button class="password-section__toggle" type="button" data-collapse-toggle="password-fields" aria-expanded="false">
+                            <span><svg viewBox="0 0 24 24"><path d="M6 10V8a6 6 0 0 1 12 0v2M5 10h14v11H5z"/></svg> Đổi mật khẩu</span>
+                            <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div class="password-fields" id="password-fields" th:classappend="${#fields.hasErrors('currentPassword') or #fields.hasErrors('newPassword') or #fields.hasErrors('confirmPassword')} ? 'is-open'">
+                            <div class="form-grid form-grid--three">
+                                <div class="form-field">
+                                    <label for="currentPassword">Mật khẩu hiện tại</label>
+                                    <input id="currentPassword" type="password" th:field="*{currentPassword}" autocomplete="current-password">
+                                    <span class="field-error" th:errors="*{currentPassword}"></span>
+                                </div>
+                                <div class="form-field">
+                                    <label for="newPassword">Mật khẩu mới</label>
+                                    <input id="newPassword" type="password" th:field="*{newPassword}" autocomplete="new-password">
+                                    <span class="field-error" th:errors="*{newPassword}"></span>
+                                </div>
+                                <div class="form-field">
+                                    <label for="confirmPassword">Xác nhận mật khẩu</label>
+                                    <input id="confirmPassword" type="password" th:field="*{confirmPassword}" autocomplete="new-password">
+                                    <span class="field-error" th:errors="*{confirmPassword}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="button button--ghost" type="reset">Hủy thay đổi</button>
+                        <button class="button button--primary" type="submit">
+                            <svg viewBox="0 0 24 24"><path d="M5 4h12l2 2v14H5zM8 4v6h8V4M8 20v-6h8v6"/></svg>
+                            Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+
+                <div class="danger-zone">
+                    <div>
+                        <strong>Vô hiệu hóa tài khoản</strong>
+                        <p>Bạn sẽ bị đăng xuất và không thể đăng nhập lại cho đến khi quản trị viên kích hoạt.</p>
+                    </div>
+                    <button class="button button--danger-outline" type="button" data-dialog-open="delete-dialog">Xóa tài khoản</button>
+                </div>
+                <p class="inline-error" th:if="${deleteError}" th:text="${deleteError}"></p>
+            </section>
+        </div>
+    </main>
+</div>
+
+<dialog class="confirm-dialog" id="delete-dialog">
+    <form th:action="@{/profile/delete}" method="post">
+        <div class="dialog-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"/></svg>
+        </div>
+        <h2>Xác nhận xóa tài khoản?</h2>
+        <p>Dữ liệu nghiệp vụ được giữ lại để bảo toàn lịch sử. Tài khoản sẽ chuyển sang trạng thái không hoạt động.</p>
+        <div class="form-field">
+            <label for="deletePassword">Nhập mật khẩu để xác nhận</label>
+            <input id="deletePassword" name="deletePassword" type="password" required autocomplete="current-password">
+        </div>
+        <div class="dialog-actions">
+            <button class="button button--ghost" type="button" data-dialog-close>Quay lại</button>
+            <button class="button button--danger" type="submit">Xác nhận xóa</button>
+        </div>
+    </form>
+</dialog>
+<div class="sidebar-backdrop" data-menu-toggle></div>
+<script th:src="@{/js/app.js}" defer></script>
+</body>
+</html>
