@@ -71,6 +71,15 @@ Các nguyên tắc chính:
 
 ## 1. Chuẩn bị database
 
+### Chức năng kho và gian hàng (Nam)
+
+- Owner: mở **Quản lý gian hàng** ngay trên dashboard để thêm, sửa hoặc xóa vị trí. Mã vị trí duy nhất, tối đa 30 ký tự (chữ không dấu, số, `-`, `_`). Xóa chỉ thực hiện được khi vị trí hết hàng; hệ thống ngừng sử dụng vị trí và giữ lịch sử.
+- Inventory Staff: mở **Kho và phân bổ hàng**, chọn sản phẩm tại vị trí nguồn, vị trí đích, số lượng và lý do chuyển. Tồn khả dụng bằng tồn thực tế trừ số lượng đã giữ. Có tìm kiếm tồn kho và lịch sử chuyển.
+- Mỗi lần chuyển ghi phiếu `STOCK_ADJUSTMENT` có tiền tố `MOVE-`, hai dòng chi tiết và hai dòng `STOCK_TRANSACTION` trong cùng giao dịch. Không cần sửa schema của file `MiniMartSWD392.sql` đã cung cấp. Tổng tồn không thay đổi.
+- URL ghi dữ liệu được phân quyền theo vai trò và bảo vệ CSRF. Các vị trí liên quan được khóa theo thứ tự ID trong lúc chuyển để tránh cập nhật chồng nhau.
+
+Chạy kiểm thử thông thường bằng `mvn test`. Chạy thêm kiểm thử SQL Server và render dashboard bằng `mvn -Dminimart.sql.integration=true test` với database mẫu đã được khởi tạo và cấu hình `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`. Dữ liệu nghiệp vụ do kiểm thử tạo được rollback.
+
 Mở SQL Server Management Studio và chạy **toàn bộ** file:
 
 ```text

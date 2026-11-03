@@ -74,6 +74,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+const stockSource = document.getElementById('stock-source');
+if (stockSource) {
+    stockSource.addEventListener('change', () => {
+        const [product, source] = stockSource.value.split(':');
+        document.getElementById('transfer-product').value = product || '';
+        document.getElementById('transfer-source').value = source || '';
+        const target = stockSource.form.elements.target;
+        for (const option of target.options) option.disabled = !!source && option.value === source;
+        if (target.value === source) target.value = '';
+    });
+}
+document.getElementById('stock-filter')?.addEventListener('input', (event) => {
+    const query = event.target.value.trim().toLocaleLowerCase('vi');
+    document.querySelectorAll('#stock-rows tr').forEach(row => {
+        row.hidden = !row.textContent.toLocaleLowerCase('vi').includes(query);
+    });
+});
+
 function validateRequired(input, message) {
     if (!input.value.trim()) {
         showFieldError(input, message);
