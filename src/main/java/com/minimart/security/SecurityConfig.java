@@ -36,6 +36,8 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/css/**", "/js/**", "/favicon.svg").permitAll()
+                        .requestMatchers("/owner/**").hasRole("OWNER")
+                        .requestMatchers("/inventory/**").hasRole("INVENTORY_STAFF")
                         .requestMatchers("/dashboard/admin").hasRole("ADMIN")
                         .requestMatchers("/dashboard/owner").hasRole("OWNER")
                         .requestMatchers("/dashboard/sale-staff").hasRole("SALE_STAFF")

@@ -26,6 +26,8 @@
         </div>
 
         <nav class="sidebar__nav" aria-label="Điều hướng chính">
+            <a class="nav-item" href="#locations" th:if="${manageLocations}">Quản lý gian hàng</a>
+            <a class="nav-item" href="#inventory" th:if="${manageInventory}">Kho và phân bổ hàng</a>
             <p class="nav-label">Danh mục</p>
             <a class="nav-item nav-item--active" href="#overview">
                 <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z"/></svg>
@@ -96,6 +98,58 @@
                 </article>
             </section>
 
+            <div class="inventory-alert" th:if="${inventoryError}" th:text="${inventoryError}" role="alert"></div>
+            <section th:if="${manageLocations}" id="locations" class="profile-card stock-panel">
+                <div class="section-heading"><div><span class="eyebrow eyebrow--green">VỊ TRÍ LƯU HÀNG</span><h2>Quản lý gian hàng</h2><p>Chuyển hết hàng trước khi xóa. Mã gian hàng là duy nhất, kể cả vị trí đã xóa.</p></div></div>
+                <h3>Thêm gian hàng</h3>
+                <form th:action="@{/owner/locations/save}" method="post" class="stock-form">
+                    <label>Mã gian hàng<input name="code" maxlength="30" pattern="[A-Za-z0-9_-]+" required placeholder="KE-A01"></label>
+                    <label>Tên gian hàng<input name="name" maxlength="120" required placeholder="Kệ đồ uống"></label>
+                    <label>Mô tả<input name="description" maxlength="255"></label>
+                    <button class="button button--primary" type="submit">Thêm gian hàng</button>
+                </form>
+                <p th:if="${#lists.isEmpty(locations)}">Chưa có gian hàng. Thêm gian hàng đầu tiên ở trên.</p>
+                <details class="location-editor" th:each="location : ${locations}">
+                    <summary><strong th:text="${location.location_code}"></strong> — <span th:text="${location.location_name}"></span></summary>
+                    <form th:action="@{/owner/locations/save}" method="post" class="stock-form">
+                        <input type="hidden" name="id" th:value="${location.location_id}">
+                        <label>Mã gian hàng<input name="code" th:value="${location.location_code}" maxlength="30" pattern="[A-Za-z0-9_-]+" required></label>
+                        <label>Tên gian hàng<input name="name" th:value="${location.location_name}" maxlength="120" required></label>
+                        <label>Mô tả<input name="description" th:value="${location.description}" maxlength="255"></label>
+                        <button class="button button--primary" type="submit">Lưu sửa đổi</button>
+                    </form>
+                    <form th:action="@{/owner/locations/{id}/delete(id=${location.location_id})}" method="post" onsubmit="return confirm('Xóa gian hàng này khỏi danh sách sử dụng?');">
+                        <button type="submit" class="button button--danger-outline">Xóa gian hàng</button>
+                    </form>
+                </details>
+            </section>
+            <section th:if="${manageInventory}" id="inventory" class="profile-card stock-panel">
+                <div class="section-heading"><div><span class="eyebrow eyebrow--green">QUẢN LÝ KHO</span><h2>Phân bổ hàng vào gian hàng</h2><p>Chuyển tồn khả dụng giữa các vị trí. Tổng số lượng sản phẩm trong hệ thống được giữ nguyên.</p></div></div>
+                <h3>Chuyển hàng</h3>
+                <form th:action="@{/inventory/transfers}" method="post" class="stock-form">
+                    <label>Sản phẩm và gian hàng nguồn
+                        <select id="stock-source" required><option value="">Chọn hàng tồn tại nguồn</option>
+                            <option th:each="row : ${stockRows}" th:if="${row.available > 0}" th:value="${row.product_id + ':' + row.location_id}" th:text="${row.sku + ' · ' + row.product_name + ' — ' + row.location_code + ' (khả dụng: ' + row.available + ')'}"></option>
+                        </select>
+                    </label>
+                    <input type="hidden" name="product" id="transfer-product"><input type="hidden" name="source" id="transfer-source">
+                    <label>Gian hàng đích<select name="target" required><option value="">Chọn gian hàng đích</option><option th:each="location : ${locations}" th:value="${location.location_id}" th:text="${location.location_code + ' · ' + location.location_name}"></option></select></label>
+                    <label>Số lượng<input type="number" name="quantity" min="1" max="2147483647" step="1" required></label>
+                    <label>Lý do chuyển<input name="reason" maxlength="500" required placeholder="Bổ sung hàng lên kệ"></label>
+                    <button type="submit" class="button button--primary">Xác nhận chuyển hàng</button>
+                </form>
+                <h3>Tồn kho theo vị trí</h3>
+                <input type="search" id="stock-filter" aria-label="Tìm sản phẩm hoặc gian hàng" placeholder="Tìm mã, tên sản phẩm hoặc gian hàng…">
+                <div class="stock-table-wrap"><table class="stock-table"><thead><tr><th>SKU</th><th>Sản phẩm</th><th>Gian hàng</th><th>Đơn vị</th><th>Tồn</th><th>Đã giữ</th><th>Khả dụng</th></tr></thead><tbody id="stock-rows">
+                    <tr th:each="row : ${stockRows}"><td th:text="${row.sku}"></td><td th:text="${row.product_name}"></td><td th:text="${row.location_code + ' · ' + row.location_name}"></td><td th:text="${row.unit}"></td><td th:text="${row.quantity_on_hand}"></td><td th:text="${row.quantity_reserved}"></td><td th:text="${row.available}"></td></tr>
+                    <tr th:if="${#lists.isEmpty(stockRows)}"><td colspan="7">Chưa có dữ liệu tồn kho.</td></tr>
+                </tbody></table></div>
+                <h3>Lịch sử chuyển hàng</h3><p>Hiển thị 50 dòng gần nhất; mỗi lần chuyển có một dòng trừ và một dòng cộng.</p>
+                <div class="stock-table-wrap"><table class="stock-table"><thead><tr><th>Phiếu / Thời gian</th><th>Nhân viên</th><th>SKU</th><th>Gian hàng</th><th>Thay đổi</th><th>Lý do</th></tr></thead><tbody>
+                    <tr th:each="row : ${transferHistory}"><td><span th:text="${row.adjustment_no}"></span><br><small th:text="${row.adjusted_at}"></small></td><td th:text="${row.full_name}"></td><td th:text="${row.sku}"></td><td th:text="${row.location_code}"></td><td th:text="${row.quantity_change}"></td><td th:text="${row.reason}"></td></tr>
+                    <tr th:if="${#lists.isEmpty(transferHistory)}"><td colspan="6">Chưa có lịch sử chuyển hàng.</td></tr>
+                </tbody></table></div>
+            </section>
             <section id="profile" class="profile-card">
                 <div class="section-heading">
                     <div>

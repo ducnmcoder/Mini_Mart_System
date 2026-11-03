@@ -351,3 +351,17 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+:root { scroll-behavior: smooth; }
+.stock-panel { margin-bottom: 24px; scroll-margin-top: 24px; }
+.stock-panel h3 { margin: 24px 0 12px; }
+.stock-form { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; margin: 16px 0; }
+.stock-form label { display: grid; gap: 8px; flex: 1 1 200px; font-size: 14px; }
+.stock-form input, .stock-form select, #stock-filter { width: 100%; padding: 12px; border: 1px solid #dce4df; border-radius: 8px; background: white; color: #24382b; font: inherit; }
+.stock-form select { max-width: 100%; }
+.stock-table-wrap { overflow-x: auto; margin: 16px 0; }
+.stock-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.stock-table th, .stock-table td { padding: 14px 12px; border-bottom: 1px solid #e4ebe6; text-align: left; overflow-wrap: anywhere; }
+.stock-table th { background: #f0f6f2; white-space: nowrap; }
+.location-editor { padding: 16px 0; border-top: 1px solid #e4ebe6; }
+.location-editor summary { cursor: pointer; }
+.inventory-alert { padding: 16px; margin-bottom: 20px; color: #9b2323; background: #fff0f0; border: 1px solid #efcccc; border-radius: 10px; }
