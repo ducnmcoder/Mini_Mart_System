@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${productId != null ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'} + ' | MiniMart'">Sản phẩm | MiniMart</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="dashboard-page">
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand sidebar__brand">
+            <span class="brand__mark" aria-hidden="true">
+                <svg viewBox="0 0 36 36"><path d="M10 10h3l2.2 12h11l2.4-8H15.4M17 28a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 17 28Zm9 0a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 26 28Z"/></svg>
+            </span>
+            <span>Mini<span>Mart</span></span>
+        </div>
+
+        <div class="role-badge">
+            <span class="role-badge__dot"></span>
+            <div><small>Không gian quản trị</small><strong>OWNER / SẢN PHẨM</strong></div>
+        </div>
+
+        <nav class="sidebar__nav" aria-label="Điều hướng chính">
+            <p class="nav-label">Danh mục</p>
+            <a class="nav-item" th:href="@{/dashboard/owner}">
+                <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z"/></svg>
+                <span>Tổng quan</span>
+            </a>
+            <a class="nav-item nav-item--active" th:href="@{/owner/products}">
+                <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2ZM16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                <span>Quản lý sản phẩm</span>
+            </a>
+            <a class="nav-item" th:href="@{/dashboard/owner#profile}">
+                <svg viewBox="0 0 24 24"><path d="M4 20v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+                <span>Thông tin cá nhân</span>
+            </a>
+        </nav>
+
+        <div class="sidebar__account">
+            <div class="sidebar-user">
+                <span class="avatar" th:text="${#strings.substring(profile.fullName,0,1)}">O</span>
+                <span><strong th:text="${profile.fullName}">Chủ cửa hàng</strong><small>Owner</small></span>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="logout-button" type="submit">
+                    <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5m5 5H3m12-9h5v18h-5"/></svg>
+                    Đăng xuất
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-button" type="button" data-menu-toggle aria-label="Mở menu">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <div>
+                <p class="topbar__date" data-current-date></p>
+                <h1 th:text="${productId != null ? 'CHỈNH SỬA SẢN PHẨM' : 'THÊM SẢN PHẨM MỚI'}">SẢN PHẨM</h1>
+            </div>
+            <div class="topbar__user">
+                <span><small>Xin chào,</small><strong th:text="${profile.fullName}">Chủ cửa hàng</strong></span>
+                <span class="avatar avatar--large" th:text="${#strings.substring(profile.fullName,0,1)}">O</span>
+            </div>
+        </header>
+
+        <div class="content-wrap">
+            <div class="breadcrumb">
+                <a th:href="@{/owner/products}">Quản lý sản phẩm</a>
+                <span>/</span>
+                <span th:text="${productId != null ? 'Chỉnh sửa' : 'Tạo mới'}">Tạo mới</span>
+            </div>
+
+            <section class="profile-card" style="margin-top: 16px;">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow eyebrow--green">THÔNG TIN SẢN PHẨM</span>
+                        <h2 th:text="${productId != null ? 'Cập nhật thông tin hàng hóa' : 'Thêm sản phẩm mới vào danh mục'}">Sản phẩm</h2>
+                        <p>Nhập đầy đủ thông tin bên dưới. Hệ thống sẽ kiểm tra trùng mã vạch và tính hợp lệ của giá bán.</p>
+                    </div>
+                </div>
+
+                <form class="profile-form" th:action="${productId != null} ? @{/owner/products/{id}(id=${productId})} : @{/owner/products}"
+                      th:object="${productRequest}" method="post" novalidate>
+
+                    <div class="form-grid">
+                        <!-- Tên sản phẩm -->
+                        <div class="form-field" th:classappend="${#fields.hasErrors('name')} ? 'has-error'">
+                            <label for="name">Tên sản phẩm <em>*</em></label>
+                            <input id="name" type="text" th:field="*{name}" maxlength="200" placeholder="Ví dụ: Nước ngọt Coca-Cola 320ml">
+                            <span class="field-error" th:errors="*{name}"></span>
+                        </div>
+
+                        <!-- Danh mục -->
+                        <div class="form-field">
+                            <label for="categoryId">Danh mục hàng hóa</label>
+                            <select id="categoryId" th:field="*{categoryId}" class="form-select">
+                                <option value="">-- Chọn danh mục --</option>
+                                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Thực phẩm</option>
+                            </select>
+                        </div>
+
+                        <!-- Barcode -->
+                        <div class="form-field" th:classappend="${#fields.hasErrors('barcode')} ? 'has-error'">
+                            <label for="barcode">Mã vạch (Barcode)</label>
+                            <input id="barcode" type="text" th:field="*{barcode}" maxlength="100" placeholder="Ví dụ: 8934567890123 (quét máy quét hoặc nhập)">
+                            <span class="field-error" th:errors="*{barcode}"></span>
+                            <span class="field-hint">Mã vạch là duy nhất, dùng để quét nhanh tại quầy bán hàng.</span>
+                        </div>
+
+                        <!-- Giá bán -->
+                        <div class="form-field" th:classappend="${#fields.hasErrors('price')} ? 'has-error'">
+                            <label for="price">Giá bán (VNĐ) <em>*</em></label>
+                            <input id="price" type="number" step="500" min="0" th:field="*{price}" placeholder="Ví dụ: 10000">
+                            <span class="field-error" th:errors="*{price}"></span>
+                        </div>
+
+                        <!-- Trạng thái (khi edit) -->
+                        <div class="form-field" th:if="${productId != null}">
+                            <label for="status">Trạng thái kinh doanh</label>
+                            <select id="status" th:field="*{status}" class="form-select">
+                                <option value="ACTIVE">Đang kinh doanh (ACTIVE)</option>
+                                <option value="INACTIVE">Tạm ngưng (INACTIVE)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- URL Ảnh & Khung Xem Trước (Image Preview) Theo Yêu Cầu Của Người Dùng -->
+                    <div class="image-preview-section">
+                        <div class="form-field" th:classappend="${#fields.hasErrors('imageUrl')} ? 'has-error'">
+                            <label for="imageUrl">Đường dẫn hình ảnh (Image URL)</label>
+                            <input id="imageUrl" type="url" th:field="*{imageUrl}" maxlength="500"
+                                   placeholder="Dán đường dẫn ảnh: https://example.com/san-pham.jpg"
+                                   data-image-preview-target="productImagePreview">
+                            <span class="field-error" th:errors="*{imageUrl}"></span>
+                            <span class="field-hint">Nhập hoặc dán link ảnh trực tuyến. Khung bên dưới sẽ hiển thị xem trước ảnh ngay lập tức.</span>
+                        </div>
+
+                        <!-- Khung Preview Ảnh trực quan -->
+                        <div class="preview-box-container">
+                            <label class="preview-label">Xem trước hình ảnh thực tế:</label>
+                            <div class="image-preview-card" id="productImagePreviewContainer">
+                                <img id="productImagePreview" th:src="*{imageUrl != null and !imageUrl.isEmpty() ? imageUrl : ''}"
+                                     alt="Xem trước ảnh sản phẩm"
+                                     th:style="*{imageUrl != null and !imageUrl.isEmpty()} ? 'display: block;' : 'display: none;'">
+                                <div id="previewPlaceholder" class="preview-placeholder"
+                                     th:style="*{imageUrl != null and !imageUrl.isEmpty()} ? 'display: none;' : 'display: flex;'">
+                                    <svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                    <span>Chưa có ảnh hoặc liên kết ảnh không hợp lệ</span>
+                                    <small>Hình ảnh sẽ hiển thị ngay khi nhập URL hợp lệ</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a th:href="@{/owner/products}" class="button button--ghost">Hủy và quay lại</a>
+                        <button class="button button--primary" type="submit">
+                            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            <span th:text="${productId != null ? 'Lưu thay đổi' : 'Tạo sản phẩm'}">Lưu sản phẩm</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/app.js}" defer></script>
+</body>
+</html>

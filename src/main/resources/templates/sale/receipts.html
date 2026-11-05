@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lịch sử đơn hàng | MiniMart</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="dashboard-page">
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand sidebar__brand">
+            <span class="brand__mark" aria-hidden="true">
+                <svg viewBox="0 0 36 36"><path d="M10 10h3l2.2 12h11l2.4-8H15.4M17 28a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 17 28Zm9 0a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 26 28Z"/></svg>
+            </span>
+            <span>Mini<span>Mart</span></span>
+        </div>
+
+        <div class="role-badge">
+            <span class="role-badge__dot"></span>
+            <div><small>Thu ngân</small><strong>LỊCH SỬ ĐƠN HÀNG</strong></div>
+        </div>
+
+        <nav class="sidebar__nav" aria-label="Điều hướng chính">
+            <p class="nav-label">Danh mục</p>
+            <a class="nav-item" th:href="@{/dashboard/sale-staff}">
+                <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z"/></svg>
+                <span>Tổng quan</span>
+            </a>
+            <a class="nav-item" th:href="@{/sale/pos}">
+                <svg viewBox="0 0 24 24"><path d="M4 5h16M4 5v14h16V5M9 12h6m-3-3v6"/></svg>
+                <span>Bán hàng (POS)</span>
+            </a>
+            <a class="nav-item nav-item--active" th:href="@{/sale/receipts}">
+                <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4"/></svg>
+                <span>Lịch sử đơn hàng</span>
+            </a>
+            <a class="nav-item" th:href="@{/dashboard/sale-staff#profile}">
+                <svg viewBox="0 0 24 24"><path d="M4 20v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+                <span>Thông tin cá nhân</span>
+            </a>
+        </nav>
+
+        <div class="sidebar__account">
+            <div class="sidebar-user">
+                <span class="avatar" th:text="${#strings.substring(profile.fullName,0,1)}">S</span>
+                <span><strong th:text="${profile.fullName}">Thu ngân</strong><small>Sale Staff</small></span>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="logout-button" type="submit">
+                    <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5m5 5H3m12-9h5v18h-5"/></svg>
+                    Đăng xuất
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-button" type="button" data-menu-toggle aria-label="Mở menu">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <div>
+                <p class="topbar__date" data-current-date></p>
+                <h1>LỊCH SỬ GIAO DỊCH BÁN HÀNG</h1>
+            </div>
+            <div class="topbar__user">
+                <span><small>Xin chào,</small><strong th:text="${profile.fullName}">Nhân viên bán hàng</strong></span>
+                <span class="avatar avatar--large" th:text="${#strings.substring(profile.fullName,0,1)}">S</span>
+            </div>
+        </header>
+
+        <div class="content-wrap">
+            <div class="page-action-bar">
+                <div>
+                    <span class="eyebrow eyebrow--green">LỊCH SỬ BÁN HÀNG</span>
+                    <h2>Danh sách các đơn hàng đã thanh toán</h2>
+                    <p>Các hóa đơn do bạn xử lý thành công tại quầy thu ngân.</p>
+                </div>
+                <a th:href="@{/sale/pos}" class="button button--primary">
+                    <svg viewBox="0 0 24 24"><path d="M4 5h16M4 5v14h16V5M9 12h6m-3-3v6"/></svg>
+                    Mở màn hình Bán hàng (POS)
+                </a>
+            </div>
+
+            <!-- BỘ LỌC TÌM KIẾM ĐƠN HÀNG VÀ KHOẢNG NGÀY -->
+            <div class="card filter-card" style="margin-bottom: 20px; padding: 16px 20px;">
+                <form th:action="@{/sale/receipts}" method="get" class="receipt-filter-form">
+                    <div class="filter-grid">
+                        <div class="filter-field">
+                            <label for="filterKeyword">Tìm theo mã đơn hoặc sản phẩm:</label>
+                            <input type="text" id="filterKeyword" name="keyword" th:value="${keyword}" placeholder="Ví dụ: #1, Gạo, Sữa, Mì..." class="form-control">
+                        </div>
+                        <div class="filter-field">
+                            <label for="filterFromDate">Từ ngày:</label>
+                            <input type="date" id="filterFromDate" name="fromDate" th:value="${fromDate}" class="form-control">
+                        </div>
+                        <div class="filter-field">
+                            <label for="filterToDate">Đến ngày:</label>
+                            <input type="date" id="filterToDate" name="toDate" th:value="${toDate}" class="form-control">
+                        </div>
+                        <div class="filter-field filter-buttons">
+                            <button type="submit" class="button button--primary">
+                                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                Lọc
+                            </button>
+                            <a th:href="@{/sale/receipts}" class="button button--ghost" title="Xóa bộ lọc">
+                                Đặt lại
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card table-container">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Thời gian</th>
+                        <th>Phương thức</th>
+                        <th>Mặt hàng</th>
+                        <th>Tổng tiền</th>
+                        <th style="text-align: right;">Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(receipts.content)}">
+                        <td colspan="6" class="empty-state">
+                            <p>Không tìm thấy đơn bán hàng nào phù hợp với điều kiện lọc.</p>
+                        </td>
+                    </tr>
+                    <tr th:each="r : ${receipts.content}">
+                        <td>
+                            <strong th:text="'#' + ${r.saleId}">#1</strong>
+                            <small th:if="${r.saleNo}" th:text="'(' + ${r.saleNo} + ')'" style="display: block; color: var(--muted); font-size: 11px;"></small>
+                        </td>
+                        <td th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</td>
+                        <td>
+                            <span th:if="${r.paymentMethod == 'VNPAY'}" class="badge badge--vnpay">
+                                VNPay QR
+                            </span>
+                            <span th:unless="${r.paymentMethod == 'VNPAY'}" class="badge badge--cash">
+                                Tiền mặt
+                            </span>
+                        </td>
+                        <td>
+                            <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;" th:text="${#lists.size(r.items)} + ' mặt hàng'">1 mặt hàng</div>
+                            <ul style="margin: 0; padding-left: 18px; font-size: 12px; color: var(--muted);">
+                                <li th:each="it : ${r.items}" th:text="${it.productName} + ' x' + ${it.quantity} + ' (' + ${#numbers.formatDecimal(it.lineTotal, 0, 'COMMA', 0, 'POINT')} + ' ₫)'">Sản phẩm x1</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <strong class="price-text" th:text="${#numbers.formatDecimal(r.grandTotal, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="display: inline-flex; gap: 8px; justify-content: flex-end;">
+                                <button type="button" class="button button--ghost button--sm btn-view-receipt" th:data-sale-id="${r.saleId}" title="Xem hóa đơn chi tiết">
+                                    <svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    Chi tiết
+                                </button>
+                                <button type="button" class="button button--danger-outline button--sm btn-refund-sale" th:data-sale-id="${r.saleId}" title="Yêu cầu hoàn trả">
+                                    <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                                    Hoàn trả
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination-bar" th:if="${receipts.totalPages > 1}">
+                    <span class="pagination-info" th:text="'Trang ' + (${currentPage + 1}) + ' / ' + ${receipts.totalPages}"></span>
+                    <div class="pagination-controls">
+                        <a th:if="${receipts.hasPrevious()}" th:href="@{/sale/receipts(keyword=${keyword}, fromDate=${fromDate}, toDate=${toDate}, page=${currentPage - 1})}" class="button button--ghost button--sm">« Trang trước</a>
+                        <a th:if="${receipts.hasNext()}" th:href="@{/sale/receipts(keyword=${keyword}, fromDate=${fromDate}, toDate=${toDate}, page=${currentPage + 1})}" class="button button--ghost button--sm">Trang sau »</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL XEM CHI TIẾT HÓA ĐƠN                                    -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<dialog id="orderDetailModal" class="receipt-dialog">
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <div class="receipt-brand">
+                <svg viewBox="0 0 36 36"><path d="M10 10h3l2.2 12h11l2.4-8H15.4M17 28a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 17 28Zm9 0a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 26 28Z"/></svg>
+                <span>MiniMart Store</span>
+            </div>
+            <p class="receipt-address">Hệ thống Siêu Thị Mini Thông Minh</p>
+            <p class="receipt-title">CHI TIẾT HÓA ĐƠN</p>
+            <div class="receipt-meta">
+                <p>Số HĐ: <strong id="detailSaleId">#0000</strong></p>
+                <p>Mã HĐ: <span id="detailSaleNo">MM...</span></p>
+                <p>Ngày: <span id="detailSaleDate">--/--/----</span></p>
+                <p>Thu ngân: <span id="detailCashier">Staff</span></p>
+                <p>Phương thức: <strong id="detailPaymentMethod">Tiền mặt</strong></p>
+            </div>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <table class="receipt-table">
+            <thead>
+            <tr>
+                <th style="text-align: left;">Sản phẩm</th>
+                <th style="text-align: center;">SL</th>
+                <th style="text-align: right;">Đơn giá</th>
+                <th style="text-align: right;">T.Tiền</th>
+            </tr>
+            </thead>
+            <tbody id="detailItemsBody"></tbody>
+        </table>
+
+        <div class="receipt-divider"></div>
+
+        <div class="receipt-totals">
+            <div class="receipt-row receipt-total-row">
+                <strong>TỔNG TIỀN:</strong>
+                <strong id="detailGrandTotal" class="receipt-amount">0 ₫</strong>
+            </div>
+            <div class="receipt-row" id="detailCashGivenRow">
+                <span>Tiền khách đưa:</span>
+                <span id="detailCashGiven">0 ₫</span>
+            </div>
+            <div class="receipt-row" id="detailChangeDueRow">
+                <span>Tiền thối lại:</span>
+                <span id="detailChangeDue">0 ₫</span>
+            </div>
+        </div>
+
+        <div class="receipt-footer">
+            <p>Cảm ơn quý khách và hẹn gặp lại!</p>
+            <small>MiniMart - Tiện lợi cho mọi gia đình</small>
+        </div>
+
+        <div class="receipt-actions no-print">
+            <button type="button" class="button button--ghost" onclick="window.print()">
+                <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                In lại hóa đơn
+            </button>
+            <button type="button" class="button button--primary" id="closeDetailModalBtn">
+                Đóng
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL XÁC NHẬN HOÀN TRẢ ĐƠN HÀNG                             -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<dialog id="refundConfirmDialog" class="payment-dialog">
+    <div class="payment-modal-container" style="max-width: 440px;">
+        <div class="payment-modal-header">
+            <div>
+                <span class="eyebrow" style="color: #e02424;">YÊU CẦU HOÀN TRẢ</span>
+                <h2>Xác nhận hoàn trả</h2>
+            </div>
+            <button type="button" class="close-icon-btn" id="closeRefundDialogBtn">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div style="padding: 16px 0;">
+            <p style="margin-bottom: 12px; font-size: 15px;">Bạn có chắc chắn muốn yêu cầu hoàn trả cho đơn hàng <strong id="refundSaleTarget">#0</strong> không?</p>
+            <div style="background: #fff8f1; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 6px; font-size: 13px; color: #92400e;">
+                <p style="margin: 0;"><strong>Lưu ý:</strong> Chức năng xử lý nhập kho hoàn trả và hoàn tiền đang được chuẩn bị để kích hoạt trong phiên bản kế tiếp. Hệ thống sẽ ghi nhận yêu cầu này vào nhật ký kiểm soát.</p>
+            </div>
+        </div>
+        <div class="payment-modal-actions">
+            <button type="button" class="button button--ghost" id="cancelRefundBtn">Hủy bỏ</button>
+            <button type="button" class="button" style="background: #e02424; color: #fff;" id="confirmRefundBtn">Gửi yêu cầu hoàn trả</button>
+        </div>
+    </div>
+</dialog>
+
+<script th:src="@{/js/app.js}" defer></script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Màn hình Bán Hàng (POS) | MiniMart</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="dashboard-page pos-page-body">
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand sidebar__brand">
+            <span class="brand__mark" aria-hidden="true">
+                <svg viewBox="0 0 36 36"><path d="M10 10h3l2.2 12h11l2.4-8H15.4M17 28a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 17 28Zm9 0a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 26 28Z"/></svg>
+            </span>
+            <span>Mini<span>Mart</span></span>
+        </div>
+
+        <div class="role-badge">
+            <span class="role-badge__dot"></span>
+            <div><small>Thu ngân</small><strong>QUẦY THU NGÂN (POS)</strong></div>
+        </div>
+
+        <nav class="sidebar__nav" aria-label="Điều hướng chính">
+            <p class="nav-label">Danh mục</p>
+            <a class="nav-item" th:href="@{/dashboard/sale-staff}">
+                <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z"/></svg>
+                <span>Tổng quan</span>
+            </a>
+            <a class="nav-item nav-item--active" th:href="@{/sale/pos}">
+                <svg viewBox="0 0 24 24"><path d="M4 5h16M4 5v14h16V5M9 12h6m-3-3v6"/></svg>
+                <span>Bán hàng (POS)</span>
+            </a>
+            <a class="nav-item" th:href="@{/sale/receipts}">
+                <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4"/></svg>
+                <span>Lịch sử đơn hàng</span>
+            </a>
+            <a class="nav-item" th:href="@{/dashboard/sale-staff#profile}">
+                <svg viewBox="0 0 24 24"><path d="M4 20v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
+                <span>Thông tin cá nhân</span>
+            </a>
+        </nav>
+
+        <div class="sidebar__account">
+            <div class="sidebar-user">
+                <span class="avatar" th:text="${#strings.substring(profile.fullName,0,1)}">S</span>
+                <span><strong th:text="${profile.fullName}">Thu ngân</strong><small>Sale Staff</small></span>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="logout-button" type="submit">
+                    <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5m5 5H3m12-9h5v18h-5"/></svg>
+                    Đăng xuất
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content pos-main">
+        <header class="topbar">
+            <button class="menu-button" type="button" data-menu-toggle aria-label="Mở menu">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <div>
+                <p class="topbar__date" data-current-date></p>
+                <h1>QUẦY BÁN HÀNG SIÊU THỊ MINI (POS)</h1>
+            </div>
+            <div class="topbar__user">
+                <span><small>Thu ngân trực ca:</small><strong th:text="${profile.fullName}">Nhân viên bán hàng</strong></span>
+                <span class="avatar avatar--large" th:text="${#strings.substring(profile.fullName,0,1)}">S</span>
+            </div>
+        </header>
+
+        <div class="content-wrap pos-wrap">
+            <div class="pos-layout">
+                <!-- CỘT TRÁI: TÌM KIẾM & CHỌN SẢN PHẨM -->
+                <section class="pos-products-panel">
+                    <div class="pos-search-header card">
+                        <div class="pos-search-input-group">
+                            <span class="pos-search-icon">
+                                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                            </span>
+                            <input type="text" id="posSearchInput" class="pos-search-field"
+                                   placeholder="Nhập tên sản phẩm hoặc quét mã vạch (Barcode)..."
+                                   autocomplete="off" autofocus>
+                            <button type="button" id="posClearSearchBtn" class="pos-clear-btn" style="display: none;">
+                                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Gợi ý từ khóa tìm kiếm nhanh -->
+                        <div class="pos-quick-pills">
+                            <span class="pills-label">Gợi ý nhanh:</span>
+                            <button type="button" class="quick-pill" data-search-pill="Gạo">Gạo</button>
+                            <button type="button" class="quick-pill" data-search-pill="Sữa">Sữa</button>
+                            <button type="button" class="quick-pill" data-search-pill="Trứng">Trứng</button>
+                            <button type="button" class="quick-pill" data-search-pill="Mì">Mì gói</button>
+                            <button type="button" class="quick-pill" data-search-pill="Xà phòng">Xà phòng</button>
+                            <button type="button" class="quick-pill" data-search-pill="Nước">Nước ngọt</button>
+                            <button type="button" class="quick-pill" data-search-pill="Bánh">Bánh kẹo</button>
+                        </div>
+                    </div>
+
+                    <!-- Khu vực kết quả sản phẩm -->
+                    <div class="pos-results-wrapper">
+                        <div id="posSearchPlaceholder" class="pos-empty-view">
+                            <div class="pos-empty-icon">
+                                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                            </div>
+                            <h3>Gõ tên, quét mã vạch hoặc bấm gợi ý nhanh</h3>
+                            <p>Các mặt hàng phù hợp sẽ hiển thị ngay tại đây để bạn chọn vào giỏ.</p>
+                        </div>
+
+                        <div id="posProductsGrid" class="pos-grid" style="display: none;"></div>
+
+                        <div id="posNoResults" class="pos-empty-view" style="display: none;">
+                            <div class="pos-empty-icon">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                            </div>
+                            <h3>Không tìm thấy sản phẩm!</h3>
+                            <p>Vui lòng kiểm tra lại tên sản phẩm hoặc mã vạch vừa quét.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CỘT PHẢI: GIỎ HÀNG & NÚT TIẾN HÀNH THANH TOÁN -->
+                <section class="pos-cart-panel card">
+                    <div class="pos-cart-header">
+                        <div>
+                            <h2>Giỏ hàng hiện tại</h2>
+                            <span id="cartCountBadge" class="pos-cart-badge">0 món</span>
+                        </div>
+                        <button type="button" id="clearCartBtn" class="button button--ghost button--sm" title="Xóa toàn bộ giỏ">
+                            <svg viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                            Làm mới giỏ
+                        </button>
+                    </div>
+
+                    <div class="pos-cart-items-wrap">
+                        <div id="emptyCartMessage" class="pos-cart-empty">
+                            <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                            <p>Chưa có sản phẩm nào trong giỏ hàng</p>
+                            <small>Hãy tìm kiếm hoặc chọn gợi ý để thêm vào đây</small>
+                        </div>
+
+                        <div id="cartItemsList" class="pos-cart-list" style="display: none;"></div>
+                    </div>
+
+                    <div class="pos-cart-footer">
+                        <div class="pos-summary-row">
+                            <span>Tạm tính (Subtotal):</span>
+                            <strong id="posSubtotalText">0 ₫</strong>
+                        </div>
+                        <div class="pos-summary-row pos-grand-total">
+                            <span>TỔNG CỘNG:</span>
+                            <strong id="posGrandTotalText">0 ₫</strong>
+                        </div>
+
+                        <!-- Bấm vào đây sẽ mở modal chọn phương thức thanh toán -->
+                        <button type="button" id="posOpenPayModalBtn" class="button button--primary button--wide pos-pay-btn" disabled>
+                            <svg viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                            <span>THANH TOÁN (CHECKOUT)</span>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL CHỌN PHƯƠNG THỨC THANH TOÁN (THEO ACTIVITY DIAGRAM)     -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<dialog id="posPaymentModal" class="payment-dialog">
+    <div class="payment-modal-container">
+        <div class="payment-modal-header">
+            <div>
+                <span class="eyebrow eyebrow--green">QUY TRÌNH THANH TOÁN</span>
+                <h2>Chọn phương thức thanh toán</h2>
+            </div>
+            <button type="button" class="close-icon-btn" id="cancelPayTopBtn" title="Thoát thanh toán">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <div class="payment-summary-box">
+            <div class="pay-sum-row">
+                <span>Số lượng món:</span>
+                <strong id="payModalItemsCount">0 món</strong>
+            </div>
+            <div class="pay-sum-row pay-sum-total">
+                <span>TỔNG TIỀN PHẢI THU:</span>
+                <strong id="payModalGrandTotal">0 ₫</strong>
+            </div>
+        </div>
+
+        <!-- TABS CHỌN PHƯƠNG THỨC THANH TOÁN -->
+        <div class="payment-tabs-nav">
+            <button type="button" class="pay-tab-btn active" data-tab="cash">
+                <svg viewBox="0 0 24 24"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                Tiền mặt (Cash)
+            </button>
+            <button type="button" class="pay-tab-btn" data-tab="vnpay">
+                <svg viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                Quét mã VNPay QR
+            </button>
+        </div>
+
+        <!-- NỘI DUNG TAB 1: TIỀN MẶT -->
+        <div class="pay-tab-content active" id="tabContentCash">
+            <div class="form-field">
+                <label for="payCashGivenInput">Số tiền khách đưa (VNĐ):</label>
+                <input type="number" id="payCashGivenInput" class="pay-cash-input" placeholder="0" min="0" step="1000">
+            </div>
+
+            <!-- Phím chọn nhanh mệnh giá tiền mặt -->
+            <div class="cash-presets-grid">
+                <button type="button" class="cash-preset-btn" id="presetExactBtn">Vừa đủ tiền</button>
+                <button type="button" class="cash-preset-btn" data-cash-val="20000">20.000 ₫</button>
+                <button type="button" class="cash-preset-btn" data-cash-val="50000">50.000 ₫</button>
+                <button type="button" class="cash-preset-btn" data-cash-val="100000">100.000 ₫</button>
+                <button type="button" class="cash-preset-btn" data-cash-val="200000">200.000 ₫</button>
+                <button type="button" class="cash-preset-btn" data-cash-val="500000">500.000 ₫</button>
+            </div>
+
+            <div class="cash-change-box">
+                <span>Tiền thối lại cho khách:</span>
+                <strong id="payChangeDueText">0 ₫</strong>
+            </div>
+
+            <div class="payment-modal-actions">
+                <button type="button" class="button button--ghost" id="cancelPayBtn">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Hủy & Quay lại giỏ
+                </button>
+                <button type="button" class="button button--primary" id="confirmCashPayBtn">
+                    <svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>
+                    Xác nhận đã nhận tiền
+                </button>
+            </div>
+        </div>
+
+        <!-- NỘI DUNG TAB 2: VNPAY SANDBOX QR -->
+        <div class="pay-tab-content" id="tabContentVnPay">
+            <div class="vnpay-qr-container">
+                <div class="vnpay-badge-header">
+                    <span class="vnpay-tag">VNPay Sandbox Gateway</span>
+                    <small>Quét mã bằng ứng dụng ngân hàng hoặc mô phỏng kết quả thanh toán</small>
+                </div>
+
+                <div class="qr-code-display-box" id="vnpayQrBox">
+                    <div class="qr-spinner" id="vnpayQrLoading">Đang tạo mã QR VNPay...</div>
+                    <img id="vnpayQrImg" src="" alt="VNPay QR Code" style="display: none;">
+                </div>
+
+                <div class="vnpay-txn-meta" id="vnpayTxnMeta" style="display: none;">
+                    <p>Mã GD: <code id="vnpayTxnRefText">MM...</code></p>
+                    <a id="vnpayDirectPayLink" href="#" target="_blank" class="vnpay-web-link">
+                        Mở trang cổng VNPay Sandbox »
+                    </a>
+                </div>
+            </div>
+
+            <div class="payment-modal-actions">
+                <button type="button" class="button button--ghost" id="cancelVnPayBtn">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    Hủy & Quay lại giỏ
+                </button>
+                <button type="button" class="button button--primary" id="confirmVnPaySuccessBtn">
+                    <svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>
+                    Xác nhận khách đã thanh toán thành công
+                </button>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODAL HÓA ĐƠN SAU KHI CHECKOUT THÀNH CÔNG                    -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<dialog id="posReceiptModal" class="receipt-dialog">
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <div class="receipt-brand">
+                <svg viewBox="0 0 36 36"><path d="M10 10h3l2.2 12h11l2.4-8H15.4M17 28a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 17 28Zm9 0a1.7 1.7 0 1 0 0-3.4A1.7 1.7 0 0 0 26 28Z"/></svg>
+                <span>MiniMart Store</span>
+            </div>
+            <p class="receipt-address">Hệ thống Siêu Thị Mini Thông Minh</p>
+            <p class="receipt-title">HÓA ĐƠN BÁN HÀNG</p>
+            <div class="receipt-meta">
+                <p>Số HĐ: <strong id="receiptSaleId">#0000</strong></p>
+                <p>Ngày: <span id="receiptDate">--/--/----</span></p>
+                <p>Thu ngân: <span id="receiptCashier">Staff</span></p>
+                <p>Phương thức: <strong id="receiptPaymentMethod">Tiền mặt</strong></p>
+            </div>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <table class="receipt-table">
+            <thead>
+            <tr>
+                <th style="text-align: left;">Sản phẩm</th>
+                <th style="text-align: center;">SL</th>
+                <th style="text-align: right;">Đơn giá</th>
+                <th style="text-align: right;">T.Tiền</th>
+            </tr>
+            </thead>
+            <tbody id="receiptItemsBody"></tbody>
+        </table>
+
+        <div class="receipt-divider"></div>
+
+        <div class="receipt-totals">
+            <div class="receipt-row receipt-total-row">
+                <strong>TỔNG TIỀN:</strong>
+                <strong id="receiptGrandTotal" class="receipt-amount">0 ₫</strong>
+            </div>
+            <div class="receipt-row">
+                <span>Tiền khách đưa:</span>
+                <span id="receiptCashGiven">0 ₫</span>
+            </div>
+            <div class="receipt-row">
+                <span>Tiền thối lại:</span>
+                <span id="receiptChangeDue">0 ₫</span>
+            </div>
+        </div>
+
+        <div class="receipt-footer">
+            <p>Cảm ơn quý khách và hẹn gặp lại!</p>
+            <small>MiniMart - Tiện lợi cho mọi gia đình</small>
+        </div>
+
+        <div class="receipt-actions no-print">
+            <button type="button" class="button button--ghost" onclick="window.print()">
+                <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                In hóa đơn
+            </button>
+            <button type="button" class="button button--primary" id="receiptNewOrderBtn">
+                <svg viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>
+                Tạo đơn mới
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<script th:src="@{/js/app.js}" defer></script>
+</body>
+</html>

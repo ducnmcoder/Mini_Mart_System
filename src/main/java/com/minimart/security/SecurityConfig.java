@@ -34,12 +34,15 @@ public class SecurityConfig {
                                             DaoAuthenticationProvider authenticationProvider) throws Exception {
         http
                 .authenticationProvider(authenticationProvider)
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/sale/**", "/owner/**"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/css/**", "/js/**", "/favicon.svg").permitAll()
                         .requestMatchers("/dashboard/admin").hasRole("ADMIN")
                         .requestMatchers("/dashboard/owner").hasRole("OWNER")
                         .requestMatchers("/dashboard/sale-staff").hasRole("SALE_STAFF")
                         .requestMatchers("/dashboard/inventory-staff").hasRole("INVENTORY_STAFF")
+                        .requestMatchers("/owner/products/**").hasAnyRole("OWNER", "ADMIN")
+                        .requestMatchers("/sale/**").hasAnyRole("SALE_STAFF", "OWNER", "ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -54,7 +57,17 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID"))
-                .exceptionHandling(ex -> ex.accessDeniedPage("/dashboard"));
+                .exceptionHandling(ex -> ex.accessDeniedHandler((request, response, accessDeniedException) -> {
+                    String accept = request.getHeader("Accept");
+                    String requestedWith = request.getHeader("X-Requested-With");
+                    if ("XMLHttpRequest".equalsIgnoreCase(requestedWith) || (accept != null && accept.contains("application/json"))) {
+                        response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("application/json;charset=UTF-8");
+                        response.getWriter().write("{\"error\":\"Bạn không có quyền thực hiện thao tác này\"}");
+                    } else {
+                        response.sendRedirect("/dashboard");
+                    }
+                }));
 
         return http.build();
     }
