@@ -63,13 +63,13 @@
 
             <form class="login-form" th:action="@{/login}" method="post" data-validate-login novalidate>
                 <div class="form-field">
-                    <label for="email">Tài khoản</label>
+                    <label for="accountName">Tên tài khoản</label>
                     <div class="input-wrap">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM4 7l8 6 8-6"/></svg>
-                        <input id="email" name="email" type="email" autocomplete="username"
-                               th:value="${email}" placeholder="Nhập địa chỉ email" maxlength="255" autofocus>
+                        <input id="accountName" name="accountName" type="text" autocomplete="username"
+                               th:value="${accountName}" placeholder="Nhập tên tài khoản" maxlength="60" autofocus>
                     </div>
-                    <span class="field-error" id="email-error"></span>
+                    <span class="field-error" id="accountName-error"></span>
                 </div>
 
                 <div class="form-field">
@@ -90,6 +90,12 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
             </form>
+            <a class="button button--google button--wide" th:if="${googleEnabled}" th:href="@{/oauth2/authorization/google}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.1a4.4 4.4 0 0 1-1.9 2.9v2.4h3.1c1.8-1.7 2.7-4.1 2.7-7.1Z" fill="#4285F4" stroke="none"/><path d="M12 21a9 9 0 0 0 6.3-2.3l-3.1-2.4a5.7 5.7 0 0 1-8.5-3H3.5v2.5A9.5 9.5 0 0 0 12 21Z" fill="#34A853" stroke="none"/><path d="M6.7 13.3a5.7 5.7 0 0 1 0-3.6V7.2H3.5a9.5 9.5 0 0 0 0 8.6l3.2-2.5Z" fill="#FBBC05" stroke="none"/><path d="M12 6.3c1.5 0 2.8.5 3.9 1.5l2.9-2.9A9 9 0 0 0 12 2a9.5 9.5 0 0 0-8.5 5.2l3.2 2.5a5.7 5.7 0 0 1 5.3-3.4Z" fill="#EA4335" stroke="none"/></svg>
+                Đăng nhập bằng Google
+            </a>
+            <button class="button button--google button--wide" th:unless="${googleEnabled}" type="button" disabled title="Chưa cấu hình Google OAuth">Đăng nhập bằng Google (chưa cấu hình)</button>
+            <a class="forgot-password-link" th:href="@{/forgot-password}">Quên mật khẩu?</a>
             <p class="login-help">Gặp sự cố đăng nhập? Liên hệ quản trị viên của cửa hàng.</p>
         </div>
     </section>

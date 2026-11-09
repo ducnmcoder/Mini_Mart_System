@@ -46,7 +46,6 @@ class ProfileUpdateRequestValidationTest {
     @Test
     void rejectsMismatchedPasswordConfirmation() {
         ProfileUpdateRequest request = validRequest();
-        request.setCurrentPassword("MiniMart@123");
         request.setNewPassword("NewPassword@123");
         request.setConfirmPassword("DifferentPassword@123");
 
@@ -54,11 +53,30 @@ class ProfileUpdateRequestValidationTest {
                 .anyMatch(violation -> violation.getPropertyPath().toString().equals("confirmPassword"));
     }
 
+    @Test
+    void acceptsMatchingNewPasswordWithoutCurrentPassword() {
+        ProfileUpdateRequest request = validRequest();
+        request.setNewPassword("NewPassword@123");
+        request.setConfirmPassword("NewPassword@123");
+
+        assertThat(validator.validate(request)).isEmpty();
+    }
+
+    @Test
+    void rejectsPasswordShorterThanEightCharacters() {
+        ProfileUpdateRequest request = validRequest();
+        request.setNewPassword("short");
+        request.setConfirmPassword("short");
+
+        assertThat(validator.validate(request))
+                .anyMatch(violation -> violation.getPropertyPath().toString().equals("newPassword"));
+    }
+
     private ProfileUpdateRequest validRequest() {
         ProfileUpdateRequest request = new ProfileUpdateRequest();
         request.setFullName("Nguyễn Văn A");
+        request.setAccountName("nguyenvana");
         request.setPhone("0901234567");
-        request.setCurrentPassword("");
         request.setNewPassword("");
         request.setConfirmPassword("");
         return request;

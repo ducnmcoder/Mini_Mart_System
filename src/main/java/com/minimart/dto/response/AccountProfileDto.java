@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public record AccountProfileDto(
         Long id,
         String email,
+        String accountName,
         String fullName,
         String phone,
         AccountStatus status,
@@ -19,6 +20,7 @@ public record AccountProfileDto(
         return new AccountProfileDto(
                 account.getId(),
                 account.getEmail(),
+                account.getAccountName(),
                 account.getFullName(),
                 account.getPhone(),
                 account.getStatus(),

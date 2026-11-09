@@ -23,24 +23,24 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
-        String email = request.getParameter("email");
+        String accountName = request.getParameter("accountName");
         String password = request.getParameter("password");
         String error;
 
-        if ((email == null || email.isBlank()) && (password == null || password.isBlank())) {
+        if ((accountName == null || accountName.isBlank()) && (password == null || password.isBlank())) {
             error = "Vui lòng nhập tài khoản và mật khẩu.";
-        } else if (email == null || email.isBlank()) {
+        } else if (accountName == null || accountName.isBlank()) {
             error = "Vui lòng nhập tài khoản.";
         } else if (password == null || password.isBlank()) {
             error = "Vui lòng nhập mật khẩu.";
-        } else if (accountRepository.findByEmailIgnoreCase(email.trim()).isEmpty()) {
+        } else if (accountRepository.findByAccountNameIgnoreCase(accountName.trim()).isEmpty()) {
             error = "Tài khoản không tồn tại. Vui lòng kiểm tra lại.";
         } else {
             error = "Mật khẩu không đúng hoặc tài khoản chưa được kích hoạt.";
         }
 
-        String encodedEmail = email == null ? "" : URLEncoder.encode(email, StandardCharsets.UTF_8);
+        String encodedName = accountName == null ? "" : URLEncoder.encode(accountName, StandardCharsets.UTF_8);
         String encodedError = URLEncoder.encode(error, StandardCharsets.UTF_8);
-        response.sendRedirect(request.getContextPath() + "/login?error=" + encodedError + "&email=" + encodedEmail);
+        response.sendRedirect(request.getContextPath() + "/login?error=" + encodedError + "&accountName=" + encodedName);
     }
 }

@@ -21,3 +21,24 @@ BEGIN
     CREATE INDEX IX_AUDIT_LOG_actor_date
         ON dbo.[AUDIT_LOG](actor_id, created_at DESC)
 END;
+
+IF COL_LENGTH(N'dbo.USER_ACCOUNT', N'deleted_at') IS NULL
+    ALTER TABLE dbo.USER_ACCOUNT ADD deleted_at DATETIME2(0) NULL;
+
+IF COL_LENGTH(N'dbo.USER_ACCOUNT', N'account_name') IS NULL
+    EXEC(N'ALTER TABLE dbo.USER_ACCOUNT ADD account_name VARCHAR(60) NULL');
+
+IF EXISTS (SELECT 1 FROM dbo.USER_ACCOUNT WHERE account_name IS NULL)
+    EXEC(N'UPDATE dbo.USER_ACCOUNT SET account_name = CASE email
+        WHEN ''admin@minimart.example'' THEN ''admin''
+        WHEN ''owner@minimart.example'' THEN ''owner''
+        WHEN ''cashier1@minimart.example'' THEN ''cashier1''
+        WHEN ''cashier2@minimart.example'' THEN ''cashier2''
+        WHEN ''inventory@minimart.example'' THEN ''inventory''
+        ELSE CONCAT(''account_'', account_id) END');
+
+IF EXISTS (SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.USER_ACCOUNT') AND name=N'account_name' AND is_nullable=1)
+    EXEC(N'ALTER TABLE dbo.USER_ACCOUNT ALTER COLUMN account_name VARCHAR(60) NOT NULL');
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id=OBJECT_ID(N'dbo.USER_ACCOUNT') AND name IN (N'UX_USER_ACCOUNT_account_name',N'UQ_USER_ACCOUNT_account_name'))
+    EXEC(N'CREATE UNIQUE INDEX UX_USER_ACCOUNT_account_name ON dbo.USER_ACCOUNT(account_name)');

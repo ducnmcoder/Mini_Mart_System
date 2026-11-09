@@ -31,10 +31,10 @@ class LoginFailureHandlerTest {
     @Test
     void reportsUnknownAccountSeparately() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setParameter("email", "unknown@example.com");
+        request.setParameter("accountName", "unknown");
         request.setParameter("password", "password");
         MockHttpServletResponse response = new MockHttpServletResponse();
-        when(repository.findByEmailIgnoreCase("unknown@example.com")).thenReturn(Optional.empty());
+        when(repository.findByAccountNameIgnoreCase("unknown")).thenReturn(Optional.empty());
 
         handler.onAuthenticationFailure(request, response, new BadCredentialsException("bad"));
 

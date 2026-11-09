@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${accountId == null ? 'Thêm tài khoản | MiniMart' : 'Sửa tài khoản | MiniMart'}"></title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="dashboard-page">
+<main class="account-management">
+    <div class="account-management__top"><a th:href="@{/admin/accounts}">← Quản lý tài khoản</a></div>
+    <div class="account-panel account-panel--form">
+        <div class="section-heading"><div><span class="eyebrow eyebrow--green">QUẢN TRỊ HỆ THỐNG</span><h1 th:text="${accountId == null ? 'Thêm tài khoản' : 'Cập nhật tài khoản'}"></h1><p th:text="${accountId == null ? 'Tạo tài khoản với mật khẩu ban đầu.' : 'Để trống mật khẩu nếu không muốn đổi.'}"></p></div></div>
+        <div class="alert alert--error" th:if="${accountError}" role="alert" th:text="${accountError}"></div>
+        <form th:action="${accountId == null} ? @{/admin/accounts} : @{/admin/accounts/{id}(id=${accountId})}" th:object="${accountRequest}" method="post">
+            <div class="form-grid">
+                <div class="form-field"><label for="managedName">Họ và tên *</label><input id="managedName" th:field="*{fullName}" maxlength="120" required><span class="field-error" th:errors="*{fullName}"></span></div>
+                <div class="form-field"><label for="managedAccountName">Tên tài khoản *</label><input id="managedAccountName" type="text" th:field="*{accountName}" maxlength="60" required><span class="field-error" th:errors="*{accountName}"></span></div>
+                <div class="form-field"><label for="managedEmail">Email *</label><input id="managedEmail" type="email" th:field="*{email}" maxlength="255" required><span class="field-error" th:errors="*{email}"></span></div>
+                <div class="form-field"><label for="managedPhone">Số điện thoại</label><input id="managedPhone" type="tel" th:field="*{phone}" maxlength="20"><span class="field-error" th:errors="*{phone}"></span></div>
+                <div class="form-field"><label for="managedRole">Vai trò *</label><select id="managedRole" th:field="*{role}" required><option value="">Chọn vai trò</option><option th:each="role : ${roles}" th:value="${role.name()}" th:text="${role.vietnameseName}"></option></select><span class="field-error" th:errors="*{role}"></span></div>
+                <div class="form-field"><label for="managedStatus">Trạng thái *</label><select id="managedStatus" th:field="*{status}" required><option th:each="status : ${statuses}" th:value="${status.name()}" th:text="${status.name() == 'ACTIVE' ? 'Đang hoạt động' : status.name() == 'INACTIVE' ? 'Ngừng hoạt động' : status.name() == 'LOCKED' ? 'Đã khóa' : 'Chờ mật khẩu'}"></option></select><span class="field-error" th:errors="*{status}"></span></div>
+                <div class="form-field"><label for="managedPassword" th:text="${accountId == null ? 'Mật khẩu *' : 'Mật khẩu mới (tùy chọn)'}"></label><input id="managedPassword" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" th:required="${accountId == null}"></div>
+                <div class="form-field"><label for="managedConfirm">Xác nhận mật khẩu</label><input id="managedConfirm" name="confirmPassword" type="password" autocomplete="new-password"></div>
+            </div>
+            <div class="form-actions"><a class="button button--ghost" th:href="@{/admin/accounts}">Hủy</a><button class="button button--primary" type="submit">Lưu tài khoản</button></div>
+        </form>
+    </div>
+</main>
+</body></html>

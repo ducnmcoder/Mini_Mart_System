@@ -15,11 +15,11 @@ public class DashboardStatisticsRepository {
     }
 
     public long countAccounts() {
-        return count("SELECT COUNT(*) FROM dbo.USER_ACCOUNT");
+        return count("SELECT COUNT(*) FROM dbo.USER_ACCOUNT WHERE deleted_at IS NULL");
     }
 
     public long countActiveAccounts() {
-        return count("SELECT COUNT(*) FROM dbo.USER_ACCOUNT WHERE status='ACTIVE'");
+        return count("SELECT COUNT(*) FROM dbo.USER_ACCOUNT WHERE status='ACTIVE' AND deleted_at IS NULL");
     }
 
     public long countActiveRoles() {

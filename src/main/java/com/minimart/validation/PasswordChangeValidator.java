@@ -14,10 +14,6 @@ public class PasswordChangeValidator implements ConstraintValidator<ValidPasswor
 
         context.disableDefaultConstraintViolation();
         boolean valid = true;
-        if (isBlank(request.getCurrentPassword())) {
-            addViolation(context, "currentPassword", "Vui lòng nhập mật khẩu hiện tại.");
-            valid = false;
-        }
         if (request.getNewPassword() == null || request.getNewPassword().length() < 8) {
             addViolation(context, "newPassword", "Mật khẩu mới phải có ít nhất 8 ký tự.");
             valid = false;
@@ -36,9 +32,5 @@ public class PasswordChangeValidator implements ConstraintValidator<ValidPasswor
         context.buildConstraintViolationWithTemplate(message)
                 .addPropertyNode(field)
                 .addConstraintViolation();
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.isBlank();
     }
 }

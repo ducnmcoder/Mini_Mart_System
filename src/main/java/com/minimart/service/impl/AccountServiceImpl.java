@@ -40,17 +40,17 @@ public class AccountServiceImpl implements AccountService {
     public AccountProfileDto updateProfile(String email, ProfileUpdateRequest request) {
         UserAccount account = requireAccount(email);
         String normalizedPhone = normalize(request.getPhone());
+        String accountName = request.getAccountName().trim();
+
+        if (accountRepository.existsByAccountNameIgnoreCaseAndIdNot(accountName, account.getId())) {
+            throw new ProfileValidationException("accountName", "Tên tài khoản đã được sử dụng.");
+        }
 
         if (normalizedPhone != null && accountRepository.existsByPhoneAndIdNot(normalizedPhone, account.getId())) {
             throw new ProfileValidationException("phone", "Số điện thoại đã được một tài khoản khác sử dụng.");
         }
-        if (request.isPasswordChangeRequested()
-                && !passwordEncoder.matches(request.getCurrentPassword(), account.getPasswordHash())) {
-            throw new ProfileValidationException("currentPassword", "Mật khẩu hiện tại không đúng.");
-        }
-
         Map<String, Object> oldValues = snapshot(account);
-        account.updateProfile(request.getFullName().trim(), normalizedPhone);
+        account.updateProfile(request.getFullName().trim(), accountName, normalizedPhone);
         if (request.isPasswordChangeRequested()) {
             account.changePassword(passwordEncoder.encode(request.getNewPassword()));
         }
@@ -83,6 +83,7 @@ public class AccountServiceImpl implements AccountService {
         values.put("fullName", account.getFullName());
         values.put("phone", account.getPhone());
         values.put("email", account.getEmail());
+        values.put("accountName", account.getAccountName());
         values.put("status", account.getStatus().name());
         return values;
     }

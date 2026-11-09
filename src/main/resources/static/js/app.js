@@ -2,16 +2,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.querySelector('[data-validate-login]');
     if (loginForm) {
         loginForm.addEventListener('submit', (event) => {
-            const email = loginForm.querySelector('#email');
+            const accountName = loginForm.querySelector('#accountName');
             const password = loginForm.querySelector('#password');
             let valid = true;
 
-            valid = validateRequired(email, 'Vui lòng nhập tài khoản.') && valid;
+            valid = validateRequired(accountName, 'Vui lòng nhập tên tài khoản.') && valid;
             valid = validateRequired(password, 'Vui lòng nhập mật khẩu.') && valid;
-            if (email.value.trim() && !email.validity.valid) {
-                showFieldError(email, 'Tài khoản phải là một địa chỉ email hợp lệ.');
-                valid = false;
-            }
             if (!valid) event.preventDefault();
         });
 

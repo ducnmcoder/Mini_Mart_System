@@ -18,8 +18,8 @@ public class MiniMartUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserAccount account = accountRepository.findByEmailIgnoreCase(email == null ? "" : email.trim())
+    public UserDetails loadUserByUsername(String accountName) throws UsernameNotFoundException {
+        UserAccount account = accountRepository.findByAccountNameIgnoreCase(accountName == null ? "" : accountName.trim())
                 .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy tài khoản"));
 
         return User.withUsername(account.getEmail())

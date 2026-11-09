@@ -35,6 +35,10 @@
                 <svg viewBox="0 0 24 24"><path d="M4 20v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>
                 <span>Quản lý thông tin cá nhân</span>
             </a>
+            <a class="nav-item" th:if="${page.account.role.name() == 'ADMIN'}" th:href="@{/admin/accounts}">
+                <svg viewBox="0 0 24 24"><path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-9a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm8-2h6m-3-3v6"/></svg>
+                <span>Quản lý tài khoản</span>
+            </a>
         </nav>
 
         <div class="sidebar__account">
@@ -123,9 +127,14 @@
                             <span class="field-error" th:errors="*{fullName}"></span>
                         </div>
                         <div class="form-field">
-                            <label for="accountEmail">Tài khoản đăng nhập</label>
+                            <label for="accountEmail">Email</label>
                             <input id="accountEmail" type="email" th:value="${page.account.email}" disabled>
-                            <span class="field-hint">Email đăng nhập được quản trị viên quản lý.</span>
+                            <span class="field-hint">Email được quản trị viên quản lý.</span>
+                        </div>
+                        <div class="form-field">
+                            <label for="accountName">Tên tài khoản <em>*</em></label>
+                            <input id="accountName" type="text" th:field="*{accountName}" maxlength="60" required>
+                            <span class="field-error" th:errors="*{accountName}"></span>
                         </div>
                         <div class="form-field">
                             <label for="phone">Số điện thoại</label>
@@ -148,13 +157,8 @@
                             <span><svg viewBox="0 0 24 24"><path d="M6 10V8a6 6 0 0 1 12 0v2M5 10h14v11H5z"/></svg> Đổi mật khẩu</span>
                             <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
-                        <div class="password-fields" id="password-fields" th:classappend="${#fields.hasErrors('currentPassword') or #fields.hasErrors('newPassword') or #fields.hasErrors('confirmPassword')} ? 'is-open'">
-                            <div class="form-grid form-grid--three">
-                                <div class="form-field">
-                                    <label for="currentPassword">Mật khẩu hiện tại</label>
-                                    <input id="currentPassword" type="password" th:field="*{currentPassword}" autocomplete="current-password">
-                                    <span class="field-error" th:errors="*{currentPassword}"></span>
-                                </div>
+                        <div class="password-fields" id="password-fields" th:classappend="${#fields.hasErrors('newPassword') or #fields.hasErrors('confirmPassword')} ? 'is-open'">
+                            <div class="form-grid">
                                 <div class="form-field">
                                     <label for="newPassword">Mật khẩu mới</label>
                                     <input id="newPassword" type="password" th:field="*{newPassword}" autocomplete="new-password">

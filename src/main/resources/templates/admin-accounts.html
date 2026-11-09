@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quản lý tài khoản | MiniMart</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="dashboard-page">
+<main class="account-management">
+    <div class="account-management__top"><a th:href="@{/dashboard/admin}">← Dashboard Admin</a><a th:href="@{/admin/accounts/new}" class="button button--primary">+ Thêm tài khoản</a></div>
+    <div class="account-panel">
+        <div class="section-heading"><div><span class="eyebrow eyebrow--green">QUẢN TRỊ HỆ THỐNG</span><h1>Quản lý tài khoản</h1></div></div>
+        <div class="toast toast--success" th:if="${successMessage}" role="status" th:text="${successMessage}"></div>
+        <div class="alert alert--error" th:if="${accountError}" role="alert" th:text="${accountError}"></div>
+        <div class="account-table-wrap"><table class="account-table">
+            <thead><tr><th>Tài khoản</th><th>Số điện thoại</th><th>Vai trò</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+            <tbody><tr th:each="account : ${accounts}">
+                <td><strong th:text="${account.fullName}"></strong><small th:text="${account.accountName}"></small><small th:text="${account.email}"></small></td>
+                <td th:text="${account.phone ?: '—'}"></td>
+                <td th:text="${account.role.name.vietnameseName}"></td>
+                <td><span class="account-status" th:classappend="${account.status.name() == 'ACTIVE'} ? 'account-status--active'" th:text="${account.status.name() == 'ACTIVE' ? 'Đang hoạt động' : account.status.name() == 'INACTIVE' ? 'Ngừng hoạt động' : account.status.name() == 'LOCKED' ? 'Đã khóa' : 'Chờ mật khẩu'}"></span></td>
+                <td><div class="account-actions">
+                    <a class="button button--ghost" th:href="@{/admin/accounts/{id}/edit(id=${account.id})}">Sửa</a>
+                    <form th:action="@{/admin/accounts/{id}/status(id=${account.id})}" method="post"><button class="button button--ghost" type="submit" th:text="${account.status.name() == 'ACTIVE' ? 'Ngừng hoạt động' : 'Kích hoạt'}"></button></form>
+                    <form th:action="@{/admin/accounts/{id}/delete(id=${account.id})}" method="post" onsubmit="return confirm('Xóa tài khoản này khỏi danh sách?')"><button class="button button--danger" type="submit">Xóa</button></form>
+                </div></td>
+            </tr><tr th:if="${#lists.isEmpty(accounts)}"><td colspan="5">Chưa có tài khoản.</td></tr></tbody>
+        </table></div>
+    </div>
+</main>
+</body></html>

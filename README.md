@@ -64,6 +64,7 @@ Các nguyên tắc chính:
 - Bốn dashboard: `ADMIN`, `OWNER`, `SALE_STAFF`, `INVENTORY_STAFF`.
 - Số liệu dashboard đọc từ các bảng nghiệp vụ tương ứng trong database.
 - Xem/sửa họ tên, thêm/sửa/xóa số điện thoại, đổi mật khẩu và lưu xuống `USER_ACCOUNT`.
+- Admin có trang quản lý tài khoản để tạo, cập nhật tên tài khoản/email/họ tên/số điện thoại/mật khẩu/vai trò/trạng thái, kích hoạt/ngừng hoạt động và xóa mềm tài khoản. Lịch sử giao dịch được giữ lại. Hệ thống chặn xóa, đổi vai trò hoặc vô hiệu hóa Admin đang hoạt động cuối cùng.
 - Ghi thay đổi hồ sơ xuống `AUDIT_LOG`.
 - Nút đăng xuất ở cuối menu bên trái trên cả bốn dashboard.
 - Giao diện responsive cho desktop, tablet và điện thoại.
@@ -108,14 +109,20 @@ Mở [http://localhost:8080](http://localhost:8080).
 
 ## Tài khoản mẫu
 
-| Dashboard | Tài khoản |
-|---|---|
-| ADMIN DASHBOARD | `admin@minimart.example` |
-| OWNER DASHBOARD | `owner@minimart.example` |
-| SALE STAFF DASHBOARD | `cashier1@minimart.example` hoặc `cashier2@minimart.example` |
-| INVENTORY STAFF DASHBOARD | `inventory@minimart.example` |
+| Dashboard | Tên tài khoản | Email mẫu |
+|---|---|---|
+| ADMIN DASHBOARD | `admin` | `admin@minimart.example` |
+| OWNER DASHBOARD | `owner` | `owner@minimart.example` |
+| SALE STAFF DASHBOARD | `cashier1` hoặc `cashier2` | `cashier1@minimart.example` hoặc `cashier2@minimart.example` |
+| INVENTORY STAFF DASHBOARD | `inventory` | `inventory@minimart.example` |
 
 Mật khẩu ban đầu là giá trị của `APP_DEMO_PASSWORD` (mặc định cho môi trường học tập: `MiniMart@123`). Hãy đổi mật khẩu ngay trong phần **Quản lý thông tin cá nhân**.
+
+## Đăng nhập bằng Google
+
+Nút **Đăng nhập bằng Google** mở màn hình chọn tài khoản Google. Ứng dụng chỉ chấp nhận email đã được Google xác minh và trùng với tài khoản đang hoạt động trong `USER_ACCOUNT`. Email không có trong database sẽ bị từ chối; hệ thống không tự tạo tài khoản mới.
+
+Tạo OAuth Client kiểu Web application trong Google Cloud, đặt Authorized redirect URI là `http://localhost:8080/login/oauth2/code/google` (đổi host/cổng khi triển khai nơi khác). Đặt `GOOGLE_CLIENT_ID` và `GOOGLE_CLIENT_SECRET` trước khi chạy ứng dụng. Email mẫu có đuôi `.example` chỉ dùng cho dữ liệu demo; Admin cần đổi thành email Google thật để kiểm thử.
 
 ## Build và kiểm thử
 
@@ -135,11 +142,13 @@ File chạy được tạo tại `target/mini-mart-system-0.0.1-SNAPSHOT.jar`.
 | `DB_PASSWORD` | rỗng | SQL Server password |
 | `APP_BOOTSTRAP_DEMO` | `true` | Kích hoạt tài khoản demo còn placeholder |
 | `APP_DEMO_PASSWORD` | `MiniMart@123` | Mật khẩu khởi tạo cho tài khoản demo |
+| `GOOGLE_CLIENT_ID` | rỗng | OAuth Client ID của Google |
+| `GOOGLE_CLIENT_SECRET` | rỗng | OAuth Client Secret của Google |
 | `SERVER_PORT` | `8080` | Cổng HTTP của ứng dụng |
 
 ## Xử lý lỗi schema SQL Server
 
-Ứng dụng dùng `PhysicalNamingStrategyStandardImpl` để giữ nguyên tên bảng trong SQL Server như `ROLE`, `USER_ACCOUNT` và `AUDIT_LOG`. Cấu hình này cần thiết khi database sử dụng collation phân biệt chữ hoa/chữ thường. Trước khi Hibernate kiểm tra schema, file `db/schema-compatibility.sql` sẽ tạo `dbo.AUDIT_LOG` nếu database được tạo từ phiên bản script cũ chưa có bảng này; bảng và dữ liệu hiện có không bị thay đổi.
+Ứng dụng dùng `PhysicalNamingStrategyStandardImpl` để giữ nguyên tên bảng trong SQL Server. Trước khi Hibernate kiểm tra schema, file `db/schema-compatibility.sql` bổ sung `USER_ACCOUNT.account_name` cho database cũ, đồng thời giữ logic tạo `AUDIT_LOG` trước đây.
 
 Các database cũ dùng role `WAREHOUSE_STAFF` cũng được hỗ trợ và tự ánh xạ sang `INVENTORY_STAFF` trong ứng dụng.
 

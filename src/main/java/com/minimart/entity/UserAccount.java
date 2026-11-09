@@ -30,6 +30,9 @@ public class UserAccount {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
+    @Column(name = "account_name", nullable = false, unique = true, length = 60)
+    private String accountName;
+
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
@@ -52,11 +55,46 @@ public class UserAccount {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     protected UserAccount() {
     }
 
-    public void updateProfile(String fullName, String phone) {
+    public UserAccount(Role role, String email, String passwordHash, String fullName, String phone, AccountStatus status) {
+        this(role, email, email.substring(0, email.indexOf('@')), passwordHash, fullName, phone, status);
+    }
+
+    public UserAccount(Role role, String email, String accountName, String passwordHash, String fullName, String phone, AccountStatus status) {
+        this.role = role;
+        this.email = email;
+        this.accountName = accountName;
+        this.passwordHash = passwordHash;
         this.fullName = fullName;
+        this.phone = phone;
+        this.status = status;
+        markUpdated();
+    }
+
+    public void updateByAdmin(Role role, String email, String accountName, String fullName, String phone, AccountStatus status) {
+        this.role = role;
+        this.email = email;
+        this.accountName = accountName;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.status = status;
+        markUpdated();
+    }
+
+    public void deleteByAdmin() {
+        this.deletedAt = LocalDateTime.now();
+        this.status = AccountStatus.INACTIVE;
+        markUpdated();
+    }
+
+    public void updateProfile(String fullName, String accountName, String phone) {
+        this.fullName = fullName;
+        this.accountName = accountName;
         this.phone = phone;
         markUpdated();
     }
@@ -80,7 +118,7 @@ public class UserAccount {
     }
 
     public boolean isLoginAllowed() {
-        return status == AccountStatus.ACTIVE && role.isActive();
+        return deletedAt == null && status == AccountStatus.ACTIVE && role.isActive();
     }
 
     private void markUpdated() {
@@ -97,6 +135,10 @@ public class UserAccount {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getAccountName() {
+        return accountName;
     }
 
     public String getPasswordHash() {
@@ -125,5 +167,9 @@ public class UserAccount {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
     }
 }
